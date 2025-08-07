@@ -11,9 +11,9 @@ services:
     volumes:
       # Persists the SQLite database file on your host machine
       - ./server/data:/app/server/data
-    env_file:
+    #env_file:
       # Loads environment variables from your .env file
-      - ./.env
+      #- ./.env
     restart: unless-stopped
 
   frontend:
