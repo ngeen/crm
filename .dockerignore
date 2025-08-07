@@ -1,0 +1,20 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+client/node_modules
+npm-debug.log
+
+# Docker
+Dockerfile*
+docker-compose.yml
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env

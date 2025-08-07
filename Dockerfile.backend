@@ -1,0 +1,19 @@
+# Use an official Node.js runtime as a parent image
+FROM node:18-alpine
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy root package files and install only production dependencies
+# This leverages Docker's layer caching for faster builds.
+COPY package.json package-lock.json* ./
+RUN npm install --production
+
+# Copy the entire server directory into the container
+COPY server/ ./server/
+
+# Expose the port the app runs on (as defined in your .env file)
+EXPOSE 5000
+
+# Command to start the server
+CMD [ "node", "server/index.js" ]
