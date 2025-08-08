@@ -1,7 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Create database directory if it doesn't exist
 const fs = require('fs');
 const dbDir = path.join(__dirname, '../data');
 if (!fs.existsSync(dbDir)) {
@@ -11,7 +10,6 @@ if (!fs.existsSync(dbDir)) {
 const dbPath = path.join(dbDir, 'crm.db');
 const db = new sqlite3.Database(dbPath);
 
-// Helper to promisify db.run for use with async/await
 const run = (sql) => {
   return new Promise((resolve, reject) => {
     db.run(sql, function (err) {
