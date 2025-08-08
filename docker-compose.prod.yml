@@ -18,7 +18,7 @@ services:
       - CLIENT_URL=${CLIENT_URL}
       - SESSION_SECRET=${SESSION_SECRET}
     volumes:
-      # Persist the data directory from the project folder.
+      # Persist the data directory from the project folder, making it portable.
       - /root/docker/crm/data:/app/data
 
   client:

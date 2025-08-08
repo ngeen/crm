@@ -12,7 +12,8 @@ const userRoutes = require('./routes/users');
 const customerRoutes = require('./routes/customers');
 const carRepairRoutes = require('./routes/car-repairs');
 const reportRoutes = require('./routes/reports');
-const { initializeDatabase } = require('./database/init');
+const { initializeDatabase, db } = require('./database/init'); // db is exported from init.js
+const { seedDatabaseIfNeeded } = require('./database/seed');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -83,6 +84,10 @@ app.get('/api/health', (req, res) => {
 
 // Initialize database and start server
 initializeDatabase()
+  .then(() => {
+    // After tables are created, seed the admin user if necessary
+    return seedDatabaseIfNeeded(db);
+  })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
