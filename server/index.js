@@ -16,12 +16,23 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Trust proxy for rate limiting
-app.set('trust proxy', 1);
+app.set('trust proxy', 1); // Recommended for rate-limiting behind a proxy
 
 // Security middleware
 app.use(helmet());
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+// In production, use the strict CLIENT_URL. In development, be more flexible.
+const corsOrigin = isProduction
+  ? process.env.CLIENT_URL
+  : [
+      'http://localhost:3000',
+      /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:3000$/, // Allow local network access
+    ];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: corsOrigin,
   credentials: true
 }));
 

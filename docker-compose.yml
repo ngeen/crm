@@ -9,28 +9,32 @@ services:
       - "3001:3001"
     environment:
       - PORT=3001
-      - CLIENT_URL=https://sanayi.oenginoz.com
+      # For development, allow requests from the local client dev server
+      - CLIENT_URL=http://localhost:3000
       - SESSION_SECRET=your-super-secret-key-for-docker
     volumes:
-      # By commenting out the line below, we use the code copied during the build.
-      # This is the line causing the issue if file sharing is not configured.
-      # - ./server:/app
+      # Mount local source code for hot-reloading.
+      # Ensure file sharing is enabled in Docker Desktop settings.
+      - ./server:/app
       - /app/node_modules
 
   client:
     build:
       context: .
       dockerfile: Dockerfile.client
+      # In development, we only need the 'builder' stage to install dependencies
+      target: builder
     ports:
       - "3000:3000"
     environment:
-      # This tells the client-side code where to find the API.
-      # For production, this should be your public API domain.
-      - REACT_APP_API_URL=https://api.oenginoz.com
+      # This tells the dev server's proxy where to send API requests.
+      # 'backend' is the service name from this file.
+      - REACT_APP_API_URL=http://backend:3001
     depends_on:
       - backend
     volumes:
-      # By commenting out the line below, we use the code copied during the build.
-      # This is a good way to run in production, but not ideal for development.
-      # - ./client:/app
+      # Mount local source code for hot-reloading.
+      - ./client:/app
       - /app/node_modules
+    # Override the production command to start the dev server
+    command: npm start
