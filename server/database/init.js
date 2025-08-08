@@ -1,22 +1,33 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const dbPath = path.join(__dirname, '../data/crm.db');
-
 // Create database directory if it doesn't exist
 const fs = require('fs');
-const dbDir = path.dirname(dbPath);
+const dbDir = path.join(__dirname, '../data');
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
+const dbPath = path.join(dbDir, 'crm.db');
 const db = new sqlite3.Database(dbPath);
 
-function initializeDatabase() {
+// Helper to promisify db.run for use with async/await
+const run = (sql) => {
   return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      // Create users table
-      db.run(`
+    db.run(sql, function (err) {
+      if (err) {
+        return reject(err);
+      }
+      resolve(this);
+    });
+  });
+};
+
+async function initializeDatabase() {
+  try {
+    console.log('Initializing database...');
+
+    await run(`
         CREATE TABLE IF NOT EXISTS users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           username TEXT UNIQUE NOT NULL,
@@ -26,17 +37,10 @@ function initializeDatabase() {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating users table:', err);
-          reject(err);
-          return;
-        }
-        console.log('Users table created successfully');
-      });
+    `);
+    console.log('Users table checked/created.');
 
-      // Create customers table
-      db.run(`
+    await run(`
         CREATE TABLE IF NOT EXISTS customers (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
@@ -50,17 +54,10 @@ function initializeDatabase() {
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (created_by) REFERENCES users (id)
         )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating customers table:', err);
-          reject(err);
-          return;
-        }
-        console.log('Customers table created successfully');
-      });
+    `);
+    console.log('Customers table checked/created.');
 
-      // Create deals table
-      db.run(`
+    await run(`
         CREATE TABLE IF NOT EXISTS deals (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           title TEXT NOT NULL,
@@ -73,17 +70,10 @@ function initializeDatabase() {
           FOREIGN KEY (customer_id) REFERENCES customers (id),
           FOREIGN KEY (created_by) REFERENCES users (id)
         )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating deals table:', err);
-          reject(err);
-          return;
-        }
-        console.log('Deals table created successfully');
-      });
+    `);
+    console.log('Deals table checked/created.');
 
-      // Create car_repairs table
-      db.run(`
+    await run(`
         CREATE TABLE IF NOT EXISTS car_repairs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           customer_id INTEGER NOT NULL,
@@ -104,17 +94,10 @@ function initializeDatabase() {
           FOREIGN KEY (customer_id) REFERENCES customers (id),
           FOREIGN KEY (created_by) REFERENCES users (id)
         )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating car_repairs table:', err);
-          reject(err);
-          return;
-        }
-        console.log('Car repairs table created successfully');
-      });
+    `);
+    console.log('Car repairs table checked/created.');
 
-      // Create repair_items table
-      db.run(`
+    await run(`
         CREATE TABLE IF NOT EXISTS repair_items (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           repair_id INTEGER NOT NULL,
@@ -125,17 +108,14 @@ function initializeDatabase() {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (repair_id) REFERENCES car_repairs (id) ON DELETE CASCADE
         )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating repair_items table:', err);
-          reject(err);
-          return;
-        }
-        console.log('Repair items table created successfully');
-        resolve();
-      });
-    });
-  });
+    `);
+    console.log('Repair items table checked/created.');
+
+    console.log('Database initialization complete.');
+  } catch (err) {
+    console.error('Error during database initialization:', err);
+    throw err; // Re-throw to be caught by the caller in index.js
+  }
 }
 
 module.exports = {
