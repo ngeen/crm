@@ -11,9 +11,6 @@ module.exports = function(app) {
     createProxyMiddleware({
       target: target,
       changeOrigin: true,
-      // Add a timeout to wait longer for the backend to respond.
-      // This can be helpful during slow server startups.
-      proxyTimeout: 60000, // 60 seconds
     })
   );
 };

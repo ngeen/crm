@@ -19,7 +19,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Trust proxy for rate limiting
-app.set('trust proxy', 1); // Recommended for rate-limiting behind a proxy
+// This is crucial for secure cookies to work behind a reverse proxy.
+// It tells Express to trust the X-Forwarded-* headers set by Nginx.
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
