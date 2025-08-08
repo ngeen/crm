@@ -1,0 +1,27 @@
+version: '3.8'
+
+# This file is for production deployments.
+# It builds the images using the multi-stage builds and does not mount local source code.
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - CLIENT_URL=https://sanayi.oenginoz.com
+      - SESSION_SECRET=your-super-secret-key-for-docker
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      # The client container now runs Nginx on port 80
+      - "3000:80"
+    depends_on:
+      - backend
