@@ -1,0 +1,18 @@
+# Use an official Node.js runtime as a parent image
+FROM node:18-alpine
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy client package files and install dependencies
+COPY client/package.json client/package-lock.json* ./
+RUN npm install
+
+# Copy client source code into the container
+COPY client/ .
+
+# Expose the port the React app runs on
+EXPOSE 3000
+
+# Command to start the client
+CMD ["npm", "start"]

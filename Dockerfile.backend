@@ -13,7 +13,7 @@ RUN npm install --production
 COPY server/ .
 
 # Expose the port the app runs on (as defined in your .env file)
-EXPOSE 5000
+EXPOSE 3001
 
 # Command to start the server
 CMD [ "node", "index.js" ]

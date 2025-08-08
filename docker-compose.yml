@@ -6,23 +6,27 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     ports:
-      # Maps port 5000 of the host to port 5000 in the container
-      - "5000:5000"
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - CLIENT_URL=http://localhost:3000
+      - SESSION_SECRET=your-super-secret-key-for-docker
     volumes:
-      # Persists the SQLite database file on your host machine
-      - ./server/data:/app/server/data
-    #env_file:
-      # Loads environment variables from your .env file
-      #- ./.env
-    restart: unless-stopped
+      - ./server:/app
+      - /app/node_modules
 
-  frontend:
+  client:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: Dockerfile.client
     ports:
-      # Maps port 3000 of the host to port 80 in the container
-      - "3000:80"
+      - "3000:3000"
+    environment:
+      # This tells the proxy where to send API requests.
+      # 'backend' is the service name from this file.
+      - REACT_APP_API_URL=http://backend:3001
     depends_on:
       - backend
-    restart: unless-stopped
+    volumes:
+      - ./client:/app
+      - /app/node_modules
