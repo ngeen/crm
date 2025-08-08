@@ -52,6 +52,12 @@ app.use('/api/', limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const sessionSecret = process.env.SESSION_SECRET;
+if (isProduction && (!sessionSecret || sessionSecret === 'your-super-secret-key-for-docker')) {
+  console.error('FATAL ERROR: SESSION_SECRET is not set to a secure, random value in the production environment.');
+  process.exit(1);
+}
+
 // Session configuration
 app.use(session({
   store: new SQLiteStore({
@@ -59,9 +65,9 @@ app.use(session({
     dir: path.join(__dirname, 'data'), // The directory where the db is stored
     table: 'sessions'
   }),
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: false,
-  saveUninitialized: false,
+  secret: sessionSecret || 'a-very-long-and-random-secret-for-development',
+  resave: true,
+  saveUninitialized: true,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true, // Prevents client-side JS from accessing the cookie.
