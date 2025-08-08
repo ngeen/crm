@@ -13,8 +13,8 @@ services:
       - SESSION_SECRET=your-super-secret-key-for-docker
     volumes:
       # By commenting out the line below, we use the code copied during the build.
-      # This is a good way to run in production, but not ideal for development.
-      - ./server:/app
+      # This is the line causing the issue if file sharing is not configured.
+      # - ./server:/app
       - /app/node_modules
 
   client:
@@ -32,5 +32,5 @@ services:
     volumes:
       # By commenting out the line below, we use the code copied during the build.
       # This is a good way to run in production, but not ideal for development.
-      - ./client:/app
+      # - ./client:/app
       - /app/node_modules
