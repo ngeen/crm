@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
@@ -52,7 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
   store: new SQLiteStore({
     db: 'database.db',
-    dir: './database', // The directory where the db is stored
+    dir: path.join(__dirname, 'data'), // The directory where the db is stored
     table: 'sessions'
   }),
   secret: process.env.SESSION_SECRET || 'your-secret-key',

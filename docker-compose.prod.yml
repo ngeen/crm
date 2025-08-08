@@ -18,8 +18,8 @@ services:
       - CLIENT_URL=${CLIENT_URL}
       - SESSION_SECRET=${SESSION_SECRET}
     volumes:
-      # Persist the SQLite database and session files across container restarts
-      - ./server/database:/app/database
+      # Persist the data directory which contains the SQLite database and session files
+      - /root/docker/crm/data:/app/data
 
   client:
     build:
