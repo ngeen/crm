@@ -14,19 +14,18 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      # Use an environment variable for the client URL, defaulting to localhost for local testing.
-      # Create a .env file to set this for your server: CLIENT_URL=http://your.ip.or.domain:3000
-      - CLIENT_URL=${CLIENT_URL:-http://localhost:3000}
-      - SESSION_SECRET=${SESSION_SECRET:-your-super-secret-key-for-docker}
+      # These variables are loaded from the .env file
+      - CLIENT_URL=${CLIENT_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
 
   client:
     build:
       context: .
       dockerfile: Dockerfile.client
       args:
-        # This is empty on purpose. The React app will make relative API calls (e.g., /api/login)
-        # which will be proxied by the Nginx server in this container.
-        - REACT_APP_API_URL=
+        # This tells the React app where to send API requests in production.
+        # It will be baked into the static files during the build.
+        - REACT_APP_API_URL=https://api.oenginoz.com
     ports:
       # The client container now runs Nginx on port 80
       - "3000:80"
