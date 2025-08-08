@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -49,6 +50,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session configuration
 app.use(session({
+  store: new SQLiteStore({
+    db: 'database.db',
+    dir: './database', // The directory where the db is stored
+    table: 'sessions'
+  }),
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,

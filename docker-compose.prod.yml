@@ -17,6 +17,9 @@ services:
       # These variables are loaded from the .env file
       - CLIENT_URL=${CLIENT_URL}
       - SESSION_SECRET=${SESSION_SECRET}
+    volumes:
+      # Persist the SQLite database and session files across container restarts
+      - ./server/database:/app/database
 
   client:
     build:
