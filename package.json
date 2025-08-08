@@ -17,6 +17,7 @@
     "express-session": "^1.17.3",
     "cors": "^2.8.5",
     "helmet": "^7.0.0",
+    "connect-sqlite3": "^0.9.15",
     "express-rate-limit": "^6.7.0",
     "sqlite3": "^5.1.6",
     "bcryptjs": "^2.4.3",
