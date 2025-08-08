@@ -19,7 +19,7 @@ services:
       - SESSION_SECRET=${SESSION_SECRET}
     volumes:
       # Persist the data directory from the project folder.
-      - /root/docker/npm/data:/app/data
+      - /root/docker/crm/data:/app/data
 
   client:
     build:
