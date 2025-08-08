@@ -12,7 +12,9 @@ services:
       - CLIENT_URL=http://localhost:3000
       - SESSION_SECRET=your-super-secret-key-for-docker
     volumes:
-      - ./server:/app
+      # By commenting out the line below, we use the code copied during the build.
+      # This is a good way to run in production, but not ideal for development.
+      # - ./server:/app
       - /app/node_modules
 
   client:
@@ -28,5 +30,7 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./client:/app
+      # By commenting out the line below, we use the code copied during the build.
+      # This is a good way to run in production, but not ideal for development.
+      # - ./client:/app
       - /app/node_modules
