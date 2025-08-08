@@ -18,8 +18,8 @@ services:
       - CLIENT_URL=${CLIENT_URL}
       - SESSION_SECRET=${SESSION_SECRET}
     volumes:
-      # Persist the data directory from the project folder, making it portable.
-      - /root/docker/crm/data:/app/data
+      # Use a named volume managed by Docker for data persistence.
+      - crm-data:/app/data
 
   client:
     build:
@@ -31,3 +31,6 @@ services:
     restart: always # Automatically restart the container if it stops
     depends_on:
       - backend
+
+volumes:
+  crm-data:
