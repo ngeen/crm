@@ -35,18 +35,71 @@ async function seedDatabaseIfNeeded(db) {
     }
     console.log(`${customers.length} sample customers created.`);
 
-    // 3. Create Sample Car Repairs
-    const repairs = [
-      { customer_id: customerIds[0], car_model: 'Ford Focus', car_year: '2018', license_plate: '34 ABC 123', repair_date: '2025-07-15', description: 'Periyodik bakım', status: 'completed', created_by: adminId },
-      { customer_id: customerIds[1], car_model: 'Renault Clio', car_year: '2020', license_plate: '34 DEF 456', repair_date: '2025-08-01', description: 'Fren balatası değişimi', status: 'in_progress', created_by: adminId }
+    // 3. Create Sample Car Repairs with Items
+    const today = new Date();
+    const formatDate = (date) => {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const repairsData = [
+      { 
+        customer_id: customerIds[0], car_model: 'Ford Focus', car_year: '2018', license_plate: '34 ABC 123', 
+        repair_date: formatDate(today), // Today's example
+        description: 'Periyodik bakım ve yağ değişimi', status: 'in_progress', created_by: adminId,
+        items: [
+            { description: 'Motor Yağı Değişimi (5L)', quantity: 1, unit_price: 850 },
+            { description: 'Yağ Filtresi', quantity: 1, unit_price: 150 },
+            { description: 'Hava Filtresi', quantity: 1, unit_price: 200 }
+        ]
+      },
+      { 
+        customer_id: customerIds[1], car_model: 'Renault Clio', car_year: '2020', license_plate: '34 DEF 456', 
+        repair_date: formatDate(new Date(new Date().setDate(today.getDate() - 7))), // Last week
+        description: 'Fren balatası ve disk değişimi', status: 'completed', created_by: adminId,
+        items: [
+            { description: 'Ön Fren Balatası Seti', quantity: 1, unit_price: 750 },
+            { description: 'Ön Fren Diski (Adet)', quantity: 2, unit_price: 900 }
+        ]
+      },
+      { 
+        customer_id: customerIds[2], car_model: 'Volkswagen Passat', car_year: '2021', license_plate: '34 GHI 789', 
+        repair_date: formatDate(new Date(new Date().setMonth(today.getMonth() - 1))), // Last month
+        description: 'Lastik değişimi ve rot balans', status: 'pending', created_by: adminId,
+        items: [
+            { description: 'Yaz Lastiği (Adet)', quantity: 4, unit_price: 1500 },
+            { description: 'Rot Balans Ayarı', quantity: 1, unit_price: 450 }
+        ]
+      }
     ];
 
-    for (const repair of repairs) {
-      await run(db, 'INSERT INTO car_repairs (customer_id, car_model, car_year, license_plate, repair_date, description, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [repair.customer_id, repair.car_model, repair.car_year, repair.license_plate, repair.repair_date, repair.description, repair.status, repair.created_by]
+    for (const repairData of repairsData) {
+      // Calculate totals
+      const subtotal = repairData.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+      const tax_rate = 18; // Assuming 18% tax
+      const tax_amount = subtotal * (tax_rate / 100);
+      const grand_total = subtotal + tax_amount;
+
+      // Insert the car_repair record
+      const repairResult = await run(db, 
+        'INSERT INTO car_repairs (customer_id, car_model, car_year, license_plate, repair_date, description, status, subtotal, tax_rate, tax_amount, grand_total, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [repairData.customer_id, repairData.car_model, repairData.car_year, repairData.license_plate, repairData.repair_date, repairData.description, repairData.status, subtotal, tax_rate, tax_amount, grand_total, repairData.created_by]
       );
+      const repairId = repairResult.lastID;
+
+      // Insert the associated repair_items
+      for (const item of repairData.items) {
+        const total_price = item.quantity * item.unit_price;
+        await run(db, 
+          'INSERT INTO repair_items (repair_id, description, quantity, unit_price, total_price) VALUES (?, ?, ?, ?, ?)',
+          [repairId, item.description, item.quantity, item.unit_price, total_price]
+        );
+      }
     }
-    console.log(`${repairs.length} sample car repairs created.`);
+    console.log(`${repairsData.length} sample car repairs with items created.`);
     console.log('--- Database seeding complete ---');
 
   } catch (err) {
