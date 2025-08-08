@@ -52,7 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 // Session configuration
 app.use(session({
   store: new SQLiteStore({
-    db: 'database.db',
+    db: 'crm.db',
     dir: path.join(__dirname, 'data'), // The directory where the db is stored
     table: 'sessions'
   }),
