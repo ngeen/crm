@@ -22,10 +22,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.client
-      args:
-        # This tells the React app where to send API requests in production.
-        # It will be baked into the static files during the build.
-        - REACT_APP_API_URL=https://api.oenginoz.com
     ports:
       # The client container now runs Nginx on port 80
       - "3000:80"

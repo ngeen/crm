@@ -26,10 +26,6 @@ services:
       target: builder
     ports:
       - "3000:3000"
-    environment:
-      # This tells the dev server's proxy where to send API requests.
-      # 'backend' is the service name from this file.
-      - REACT_APP_API_URL=http://backend:3001
     depends_on:
       - backend
     volumes:

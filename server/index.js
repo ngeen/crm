@@ -57,8 +57,8 @@ app.use(session({
     httpOnly: true, // Prevents client-side JS from accessing the cookie.
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     // For cross-domain cookies, SameSite=None and Secure=true are required.
-    // 'lax' is a safe default for development.
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    // Since the API is now proxied under the same domain, 'lax' is the correct and secure default for both dev and prod.
+    sameSite: 'lax'
   }
 }));
 
