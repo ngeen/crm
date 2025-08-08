@@ -12,9 +12,7 @@ services:
       - CLIENT_URL=https://sanayi.oenginoz.com
       - SESSION_SECRET=your-super-secret-key-for-docker
     volumes:
-      # By commenting out the line below, we use the code copied during the build.
-      # This is the line causing the issue if file sharing is not configured.
-      # - ./server:/app
+      - ./server:/app
       - /app/node_modules
 
   client:
@@ -24,13 +22,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # This tells the client-side code where to find the API.
-      # For production, this should be your public API domain.
-      - REACT_APP_API_URL=https://api.oenginoz.com
+      # This tells the proxy where to send API requests.
+      # 'backend' is the service name from this file.
+      - REACT_APP_API_URL=http://backend:3001
     depends_on:
       - backend
     volumes:
-      # By commenting out the line below, we use the code copied during the build.
-      # This is a good way to run in production, but not ideal for development.
-      # - ./client:/app
+      - ./client:/app
       - /app/node_modules
