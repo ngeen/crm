@@ -5,6 +5,11 @@ FROM node:18-alpine AS builder
 # Set the working directory in the container
 WORKDIR /app
 
+# Declare the build-time argument from docker-compose
+ARG REACT_APP_API_URL
+# Set it as an environment variable for the builder stage
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 # Copy client package files and install dependencies
 COPY client/package.json client/package-lock.json* ./
 RUN npm install --silent
@@ -12,7 +17,7 @@ RUN npm install --silent
 # Copy client source code into the container
 COPY client/ .
 
-# Build the React application for production
+# Build the React application for production, using the environment variable
 RUN npm run build
 
 # --- Production Stage ---
